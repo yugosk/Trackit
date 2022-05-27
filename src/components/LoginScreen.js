@@ -7,13 +7,12 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate;
 
     function submitLogin(event) {
         event.preventDefault();
-        const regEmail = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$/i;
-        if (!email.match(regEmail) || password === "") {
-            alert("Preencha os campos corretamente.");
-        } else {
+        const regEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i;
+        if (regEmail.test(email) && password !== "") {
             const promise = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/login", {
                 email: email,
                 password: password
@@ -23,8 +22,10 @@ export default function Login() {
             promise.catch(err => console.log(err));
             console.log("sucesso");
 
-//            navigate("/habitos");
-        }
+            navigate("/habitos");
+} else {
+    alert("Preencha os campos corretamente.");
+}
     }
 
     return (
@@ -146,4 +147,5 @@ export const SwitchLogin = styled.p`
     text-decoration-line: underline;
     color: #52b6ff;
     margin-top: 25px;
+    margin-bottom: 25px;
 `

@@ -13,11 +13,9 @@ export default function Register() {
 
     function submitRegister(event) {
         event.preventDefault();
-        const regEmail = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$/i;
-        const regURL = /(https?:\/\/.*\.(?:png|jpg|jpeg))/i;
-        if (!email.match(regEmail) || password === "" || !photo.match(regURL)) {
-            alert("Preencha os campos corretamente.");
-        } else {
+        const regEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i;
+        const regURL = /([a-z\-_0-9\/\:\.]*\.(jpg|jpeg|png|gif))/i;
+        if (regEmail.test(email) && password !== "" && name !== "" && regURL.test(photo)) {
             const promise = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/sign-up", {
                 email: email,
                 name: name,
@@ -29,6 +27,8 @@ export default function Register() {
             promise.catch(err => console.log(err));
 
             navigate("/");
+        } else {
+            alert("Preencha os campos corretamente.");
         }
     }
 

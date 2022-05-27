@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import logoImg from "../assets/logo-trackit.png"
 import styled from "styled-components";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import UserContext from "../contexts/UserContext";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { token, setToken } = useContext(UserContext);
     const navigate = useNavigate;
 
     function submitLogin(event) {
@@ -18,10 +20,9 @@ export default function Login() {
                 password: password
             })
 
-            promise.then(response => console.log(response));
+            promise.then(response => setToken(response.data.token));
             promise.catch(err => console.log(err));
-            console.log("sucesso");
-
+            
             navigate("/habitos");
 } else {
     alert("Preencha os campos corretamente.");

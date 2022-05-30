@@ -21,8 +21,9 @@ export default function Login() {
                 email: email,
                 password: password
             })
-            
-            promise.then(response =>{
+           
+            promise.then(response => {
+                console.log(response.data);
                 setUser({
                     id: response.data.id,
                     name: response.data.name,
@@ -31,9 +32,9 @@ export default function Login() {
                     password: response.data.password,
                     token: response.data.token
             });
-            console.log("pegou os dados")
             navigate("/habitos");
         });
+        
             promise.catch(err => {
                 switch(err.response.status) {
                     case 401:

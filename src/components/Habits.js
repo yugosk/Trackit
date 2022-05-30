@@ -13,7 +13,7 @@ export default function Habits() {
         days: []
     });
     const [habitList, setHabitList] = useState([]);
-    const { user, setUser } = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     const weekdays = ["D", "S", "T", "Q", "Q", "S", "S"];
 
@@ -34,25 +34,27 @@ export default function Habits() {
     }
 
     function getHabits() {
-        // const promise = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", {
-        //     headers: {
-        //         'Authorization': `Bearer ${user.token}`  
-        //     }
-        // });
-        // promise.then(response => console.log(response));
-        console.log("habitos requisitados");
+        const promise = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", {
+            headers: {
+                "Authorization": `Bearer ${user.token}`
+            }
+        });
+        promise.then(response => {
+            setHabitList(response.data);
+            console.log(habitList);
+        });
     }
 
     function submitNewHabit() {
-        // if(habit.name !== "" && Habits.days.length > 0) {
-        //     const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", habit, {
-        //         headers: {
-        //             'Authorization': `Bearer ${user.token}`  
-        //         }
-        //     });
-        //     request.then(response => console.log(response.data));
-        //     request.catch(err => console.log(err.response.status));
-        // }
+        if(habit.name !== "" && habit.days.length > 0) {
+            const promise = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", habit, {
+                headers: {
+                    "Authorization": `Bearer ${user.token}`
+                }
+            });
+            promise.then(response => console.log(response.data));
+            promise.catch(err => console.log(err.response.status));
+        }
         console.log("habito adicionado");
     }
 
@@ -68,20 +70,9 @@ export default function Habits() {
                     <p>Meus hábitos</p>
                     <button onClick={toggleHabitCreation}>+</button>
                 </HabitText>
-                <MyHabit>
-                    <StyledHabit>
-                        <h2>Nome do hábito</h2>
-                        <ion-icon name="trash-outline"></ion-icon>
-                    </StyledHabit>
-                    <DayList>
-                        {weekdays.map((day, index) => <WeekDay 
-                            key={index}
-                            day={day}
-                            number={index+1}
-                            habit={habit}
-                            setHabit={setHabit} />)}
-                    </DayList>
-                </MyHabit>
+                {
+                    habitList.map((habit, index) => <HabitsListing habitName={habit.name} habitDays={habit.days} key={index} />)
+                }
                 <AddHabit display={habitCreation ? "block" : "none"}>
                     <input type="text" placeholder="nome do hábito" value={habit.name} onChange={(e) => setHabit({...habit, name: e.target.value})} />
                     <DayList>
@@ -100,6 +91,42 @@ export default function Habits() {
             </HabitContainer>
             <Footer />
         </>
+    );
+}
+
+function HabitsListing({ habitName, habitDays }) {
+    function weekdayBgColor(number) {
+        if (habitDays.includes(number)) {
+            return "#cfcfcf";
+        } else {
+            return "#ffffff";
+        }
+    }
+
+    function weekdayFontColor(number) {
+        if (habitDays.includes(number)) {
+            return "#ffffff";
+        } else {
+            return "##dbdbdb";
+        }
+    }
+
+    return (
+        <MyHabit>
+            <StyledHabit>
+                <h2>{habitName}</h2>
+                <ion-icon name="trash-outline"></ion-icon>
+            </StyledHabit>
+            <DayList>
+                <StyledWeekDay background={weekdayBgColor(0)} font={weekdayFontColor(0)}><p>D</p></StyledWeekDay>
+                <StyledWeekDay background={weekdayBgColor(1)} font={weekdayFontColor(1)}><p>S</p></StyledWeekDay>
+                <StyledWeekDay background={weekdayBgColor(2)} font={weekdayFontColor(2)}><p>T</p></StyledWeekDay>
+                <StyledWeekDay background={weekdayBgColor(3)} font={weekdayFontColor(3)}><p>Q</p></StyledWeekDay>
+                <StyledWeekDay background={weekdayBgColor(4)} font={weekdayFontColor(4)}><p>Q</p></StyledWeekDay>
+                <StyledWeekDay background={weekdayBgColor(5)} font={weekdayFontColor(5)}><p>S</p></StyledWeekDay>
+                <StyledWeekDay background={weekdayBgColor(6)} font={weekdayFontColor(6)}><p>S</p></StyledWeekDay>
+            </DayList>
+        </MyHabit>
     );
 }
 
@@ -125,9 +152,6 @@ function WeekDay({ day, number, habit, setHabit }) {
         );
     };
 }
-
-function DailyHabits() {}
-
 
 const MyHabit = styled.div`
     width: 90%;

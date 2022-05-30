@@ -10,7 +10,7 @@ import Today from "./Today.js";
 import History from "./History.js"
 
 export default function App() {
-    const [user, SetUser] = useState({
+    const [user, setUser] = useState({
         id: "",
         name: "",
         image: "",
@@ -20,8 +20,8 @@ export default function App() {
     });
 
     return (
-        <BrowserRouter>
-            <UserContext.Provider value={[{ user, SetUser }]}>
+        <UserContext.Provider value={{ user, setUser }}>
+            <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Login />} />
                     <Route path="/cadastro" element={<Register />} />
@@ -30,7 +30,7 @@ export default function App() {
                     <Route path="historico" element={<History />} />
                 </Routes>
                 <GlobalStyled />
-            </UserContext.Provider>
-        </BrowserRouter>
+            </BrowserRouter>
+        </UserContext.Provider>
     );
 }

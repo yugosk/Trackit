@@ -17,6 +17,21 @@ export default function Habits() {
 
     const weekdays = ["D", "S", "T", "Q", "Q", "S", "S"];
 
+    useEffect(() => {
+        getHabits();
+    }, [user]);
+
+    function getHabits() {
+        const promise = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", {
+            headers: {
+                "Authorization": `Bearer ${user.token}`
+            }
+        });
+        promise.then(response => {
+            setHabitList(response.data);
+        });
+    }
+
     function toggleHabitCreation() {
         if (habitCreation) {
             setHabitCreation(false);
@@ -33,34 +48,23 @@ export default function Habits() {
         setHabitCreation(false);
     }
 
-    function getHabits() {
-        const promise = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", {
-            headers: {
-                "Authorization": `Bearer ${user.token}`
-            }
-        });
-        promise.then(response => {
-            setHabitList(response.data);
-            console.log(habitList);
-        });
-    }
 
-    function submitNewHabit() {
+    function submitNewHabit(e) {
+        e.preventDefault();
+        console.log(user);
+        console.log(habit);
         if(habit.name !== "" && habit.days.length > 0) {
             const promise = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits", habit, {
                 headers: {
                     "Authorization": `Bearer ${user.token}`
                 }
             });
-            promise.then(response => console.log(response.data));
-            promise.catch(err => console.log(err.response.status));
+            promise.then(() => {
+                getHabits();
+                setHabitCreation(false);
+            });
         }
-        console.log("habito adicionado");
     }
-
-    useEffect(() => {
-        getHabits();
-    }, []);
 
     return (
         <>
@@ -71,9 +75,11 @@ export default function Habits() {
                     <button onClick={toggleHabitCreation}>+</button>
                 </HabitText>
                 {
-                    habitList.map((habit, index) => <HabitsListing habitName={habit.name} habitDays={habit.days} key={index} />)
+                    habitList.map((habit, index) => <HabitsListing habitName={habit.name} habitDays={habit.days}
+                    token={user.token} key={index} id={habit.id}
+                    habitList={habitList} setHabitList={setHabitList} />)
                 }
-                <AddHabit display={habitCreation ? "block" : "none"}>
+                <AddHabit display={habitCreation ? "flex" : "none"}>
                     <input type="text" placeholder="nome do hábito" value={habit.name} onChange={(e) => setHabit({...habit, name: e.target.value})} />
                     <DayList>
                         {weekdays.map((day, index) => <WeekDay 
@@ -94,7 +100,19 @@ export default function Habits() {
     );
 }
 
-function HabitsListing({ habitName, habitDays }) {
+function HabitsListing({ habitName, habitDays, id, token, habitList, setHabitList }) {
+    function deleteHabit(n) {
+        const promise = axios.delete(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        promise.then(() => {
+            const newArray = habitList.filter(habit => habit.id !== n)
+            setHabitList(newArray);
+        })
+    }
+
     function weekdayBgColor(number) {
         if (habitDays.includes(number)) {
             return "#cfcfcf";
@@ -115,7 +133,7 @@ function HabitsListing({ habitName, habitDays }) {
         <MyHabit>
             <StyledHabit>
                 <h2>{habitName}</h2>
-                <ion-icon name="trash-outline"></ion-icon>
+                <ion-icon name="trash-outline" onClick={() => deleteHabit(id)}></ion-icon>
             </StyledHabit>
             <DayList>
                 <StyledWeekDay background={weekdayBgColor(0)} font={weekdayFontColor(0)}><p>D</p></StyledWeekDay>
@@ -233,7 +251,7 @@ const AddHabitButtons = styled.div`
 
 const AddHabit = styled.form`
     width: 90%;
-    height: 180px;
+    min-height: 180px;
     padding: 18px;
     background: #FFFFFF;
     border-radius: 5px;
@@ -270,6 +288,7 @@ const HabitContainer = styled.div`
     padding-bottom: 101px;
     justify-content: flex-start;
     background-color: #e5e5e5;
+    overflow-y: scroll;
 `
 
 const HabitText = styled.div`

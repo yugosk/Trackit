@@ -9,7 +9,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("")
-    const { setUser } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
     const navigate = useNavigate();
 
     function submitLogin(event) {
@@ -23,16 +23,8 @@ export default function Login() {
             })
            
             promise.then(response => {
-                console.log(response.data);
-                setUser({
-                    id: response.data.id,
-                    name: response.data.name,
-                    image: response.data.image,
-                    email: response.data.email,
-                    password: response.data.password,
-                    token: response.data.token
-            });
-            navigate("/habitos");
+                setUser(response.data);
+                navigate("/habitos");
         });
         
             promise.catch(err => {

@@ -8,24 +8,57 @@ import UserContext from "../contexts/UserContext";
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { token, setToken } = useContext(UserContext);
-    const navigate = useNavigate;
+    const [error, setError] = useState("")
+    const { setUser } = useContext(UserContext);
+    const navigate = useNavigate();
 
     function submitLogin(event) {
         event.preventDefault();
         const regEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i;
         if (regEmail.test(email) && password !== "") {
+            setError("");
             const promise = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/login", {
                 email: email,
                 password: password
             })
-
-            promise.then(response => setToken(response.data.token));
-            promise.catch(err => console.log(err));
+            
+            promise.then(response =>{
+                setUser({
+                    id: response.data.id,
+                    name: response.data.name,
+                    image: response.data.image,
+                    email: response.data.email,
+                    password: response.data.password,
+                    token: response.data.token
+            });
+            console.log("pegou os dados")
+            navigate("/habitos");
+        });
+            promise.catch(err => {
+                switch(err.response.status) {
+                    case 401:
+                        setError("Usuário não encontrado. Verifique os dados inseridos!");
+                        setEmail("");
+                        setPassword("");
+                        break;
+                    case 422:
+                        setError("Dados inválidos. Tente novamente!");
+                        setEmail("");
+                        setPassword("");
+                        break;
+                    case 500:
+                        setError("Servidor indisponível no momento. Tente novamente mais tarde!");
+                        break;
+                    default:
+                        setError("Verifique os dados inseridos!");
+                }
+                alert(error);
+            });
             
             navigate("/habitos");
 } else {
-    alert("Preencha os campos corretamente.");
+    setError("Favor preencher todos os campos!");
+    alert(error);
 }
     }
 

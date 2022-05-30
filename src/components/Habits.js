@@ -85,7 +85,7 @@ export default function Habits() {
                         {weekdays.map((day, index) => <WeekDay 
                             key={index}
                             day={day}
-                            number={index+1}
+                            number={index}
                             habit={habit}
                             setHabit={setHabit} />)}
                     </DayList>

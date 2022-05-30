@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
+import UserContext from "../contexts/UserContext";
 
 export default function Header() {
+    const { user } = useContext(UserContext);
+
     return (
         <StyledHeader>
             <h1>Trackit</h1>
-            <img src={"https://i.pinimg.com/736x/f0/af/cb/f0afcbce7ed4a7df7b822964501bf995.jpg"} />
+            <img src={user.image} />
         </StyledHeader>
     );
 }
